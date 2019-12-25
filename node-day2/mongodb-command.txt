@@ -1,0 +1,40 @@
+启动数据库
+mongod --dbpath 数据库存放位置（默认为/data/db）
+
+mongo 使用数据库
+
+mongoimport --db dbname --collection collectionname --drop --file jsonpath
+
+--drop为清除集合文档
+
+show dbs 显示数据库
+
+show collections 显示集合
+
+use [db-name] 使用数据库或创建数据库
+
+db 查看当前数据库
+
+db.collection-name.insert(json) 
+
+db.dropDatabase() 删除数据库
+
+db.collection-name.find({"name": "xiaoming"}) 根据条件查找数据库
+
+db.collection-name.drop() 删除集合
+
+db.collection-name.find().sort({"name": -1, "age": 1}) 1表示升序
+
+db.collection-name.find({ "age": { $gt: 18 } })
+
+db.collection-name.find({ $or: [{ "name": "xiaoming", "age": 29 }] })
+
+db.student.update({ "name": "小刘" }, { $set: { "age": 23 }, $currentDate: { "lastModified": true } })
+
+db.student.updateMany({ "score.shuxue": 98 }, { $set: { "age": 18 } })
+
+没有$set将完整替换
+db.student.update({ "name": "小刘" }, { "name": "大刘", "age": 30 })
+
+db.student.remove({ "score.yuwen": 90 }, { justOne: true })
+

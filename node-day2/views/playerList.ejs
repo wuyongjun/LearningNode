@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>ejs</title>
+</head>
+<body>
+	<h1>我喜欢的NBA球员</h1>
+	<ul>
+		<% for (var i = 0; i < players.length; i++) { %>
+			<li><%= players[i] %></li>
+		<% } %>
+	</ul>
+</body>
+</html>

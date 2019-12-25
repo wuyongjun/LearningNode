@@ -1,0 +1,19 @@
+{
+  "name": "node-study-day1",
+  "version": "1.0.0",
+  "description": "study node note files",
+  "main": "index.js",
+  "dependencies": {
+    "ejs": "^3.0.1",
+    "formidable": "^1.2.1",
+    "jade": "^1.11.0",
+    "pug": "^2.0.4",
+    "silly-datetime": "^0.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "wuyongjun",
+  "license": "ISC"
+}
