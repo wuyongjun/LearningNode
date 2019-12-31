@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>canvas</title>
+	<style type="text/css">
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+<div>
+	<canvas id="canvas" width="800" height="800"></canvas>
+</div>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+	let canvas = document.getElementById('canvas');
+	let ctx = canvas.getContext('2d');
+	let colors = ['red', 'black', 'green', 'lightblue', 'pink', 'yellow', 'orange'];
+	let myColor = colors[parseInt(Math.random() * colors.length)];
+	let socket = io();
+
+	function handler (e) {
+		ctx.beginPath();
+		ctx.arc(e.pageX, e.pageY, 5, 0, Math.PI * 2, true);
+		ctx.fillStyle = myColor;
+		ctx.fill();
+
+		socket.emit('south/canvas', {
+			pageX: e.pageX,
+			pageY: e.pageY,
+			color: myColor
+		});
+	}
+
+	canvas.onmousedown = function () {
+		canvas.addEventListener('mousemove', handler, true);
+	};
+
+	canvas.onmouseup = function () {
+		canvas.removeEventListener('mousemove', handler, true);
+	};
+
+	socket.on('canvas', function (msg) {
+		ctx.beginPath();
+		ctx.arc(msg.pageX, msg.pageY, 5, 0, Math.PI * 2, true);
+		ctx.fillStyle = msg.color;
+		ctx.fill();
+	});
+
+	socket.on('south/canvas', function (msg) {
+		ctx.beginPath();
+		ctx.arc(msg.pageX, msg.pageY, 5, 0, Math.PI * 2, true);
+		ctx.fillStyle = myColor;
+		ctx.fill();
+	});
+
+</script>
+</body>
+</html>

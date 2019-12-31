@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>socket</title>
+</head>
+<body>
+<h2>我是首页，我调用了隐藏的socket.io.js的io函数</h2>
+<input type="text" id="tx" value="" width="500" />
+<button type="button" id="btn">发 送</button>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+	let socket = io();
+	document.getElementById('btn').onclick = function () {
+		socket.emit('question', document.getElementById('tx').value);
+	};
+	socket.on('answer', function (msg) {
+		console.log(msg);
+	});
+</script>
+</body>
+</html>

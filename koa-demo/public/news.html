@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>news</title>
+</head>
+<body>
+	<div>
+		<select id="channel">
+			<option value="">===全部===</option>
+			<option value="index">热门</option>
+			<option value="guonei">国内</option>
+			<option value="guoji">国际</option>
+			<option value="war">战争</option>
+		</select>
+		<select id="page"></select>
+		<ul id="list"></ul>
+	</div>
+	<script type="text/javascript">
+		let oChannel = document.getElementById('channel');
+		let oPage = document.getElementById('page');
+		let oList = document.getElementById('list');
+
+		oChannel.onchange = function (evt) {
+			getList(1, this.value);
+		};
+
+		oPage.onchange = function (evt) {
+			getList(this.value, oChannel.value);
+		};
+
+		function getList (page = 1, channel = '') {
+			let xhr = new XMLHttpRequest();
+			xhr.open('get', `/getList?page=${page}&channel=${channel}`);
+			xhr.send();
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState === 4) {
+					// add news list
+					let { items, total } = JSON.parse(xhr.response);
+					oList.innerHTML = '';
+					items.forEach(item => {
+						let oLi = document.createElement('li');
+						oLi.innerHTML = item.title;
+						oList.appendChild(oLi);
+					});
+					// add page select
+					while (oPage.options.length > 0) {
+						oPage.options.remove(0);
+					}
+					for (let i = 1; i <= total; i++) {
+						oPage.options.add(new Option(`第${i}页`, i));
+					}
+					oPage.value = page;
+				}
+			};
+		}
+
+		getList();
+	</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>我的留言板</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+      #succ, #fail {
+        display: none;
+      }
+      .message-list {
+        border-bottom: 1px solid black;
+        margin-bottom: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12"><h3>欢迎来到我的留言板</h3></div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="alert alert-success" id="succ" role="alert">恭喜，添加留言成功！</div>
+          <div class="alert alert-danger" id='fail' role="alert">抱歉，添加留言失败！</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label for="name" class="col-sm-2 control-label">姓 名：</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="name" placeholder="name">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="content" class="col-sm-2 control-label">内 容：</label>
+              <div class="col-sm-10">
+                <textarea class="form-control" id="content" placeholder="content" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button id="sendMessage" type="button" class="btn btn-success">提 交</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <ul class="pagination">
+            
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div id="messages"></div>
+        </div>
+      </div>
+    </div>
+    <script type="text/template" id="pageTemplate">
+      <li class="page-number" data-page="{{= i }}">
+        <a href="#">{{= i }}</a>
+      </li>
+    </script>
+    <script type="text/template" id="mesTemplate">
+      <div class="message-list">
+        <!--这里改动了underscore源码的插入表达式-->
+          <p>【名字】{{= name }}</p>
+          <p>【留言】{{= content }}</p>
+          <p>【时间】{{= createtime}}</p>
+          <p>【操作】<a href="/removeMessage?id={{= id}}">删 除</a></p>
+      </div>
+    </script>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/underscore-noflict-min.js"></script>
+    <script>
+      // add message content
+      $('#sendMessage').click(function () {
+        $('#succ').hide();
+        $('#fail').hide();
+        $.post('/sendMessage', {
+          "name": $('#name').val(),
+          "content": $('#content').val()
+        }, function (result) {
+          if (result.status === 'error') {
+            $('#fail').fadeIn();
+          } else {
+            $('#succ').fadeIn();
+            $('#name').val('');
+            $('#content').val('');
+            getList(1);
+            getCount();
+          }
+        });
+      });
+
+      getList(1);
+      getCount();
+      function getList (page) {
+        // get message list
+        $.get('/getList?page=' + page, function (result) {
+          let { status, data } = result;
+          if (status === 'success') {
+            $('#messages').html('');
+            // 得到模版，生成编译函数
+            let compiled = _.template($('#mesTemplate').html());
+            data.forEach((item, index) => {
+              // 绑定模版数据
+              let html = compiled({ name: item.name, content: item.content, createtime: item.createtime, id: item._id });
+              $('#messages').append(html);
+            });
+          }
+        });
+      }
+
+      // get count
+      function getCount () {
+        $.get('/count', function (result) {
+          console.log(result);
+          initPage(result.data);
+        });
+      }
+
+      // init page
+      function initPage (count) {
+        $('.pagination').html('');
+        let compiled = _.template($('#pageTemplate').html());
+        for (let i = 1; i <= Math.ceil(count / 4); i++) {
+          let html = compiled({ i: i });
+          $('.pagination').append(html);
+        }
+        $('.page-number:first').addClass('active');
+        // fenye
+        $('.page-number').click(function () {
+          let page = parseInt($(this).attr('data-page'));
+          console.log(page)
+          getList(page);
+
+          $(this).addClass('active').siblings().removeClass('active');
+        });
+      };
+    </script>
+  </body>
+</html>
