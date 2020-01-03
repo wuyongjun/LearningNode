@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+
+    <title>wyj's forum</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/jumbotron.css" rel="stylesheet">
+    <style type="text/css">
+      .avatar {
+        border-radius: 50%;
+        width: 30px;
+      }
+      .grid {
+        height: 240px;
+      }
+      #posts {
+        height: 400px;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <%- include('header.ejs') %>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <% if (!login) { %>
+          <div class="row">
+            <div class="col-md-6 col-sm-6">
+              <h2>欢迎注册</h2>
+              <p>说说论坛是我们交流的自由乐园。</p>
+              <p><a class="btn btn-primary btn-lg" href="/regist" role="button">注册 &raquo;</a></p>
+            </div>
+            <div class="col-md-6 col-sm-6">
+              <p>已有登录账号</p>
+              <form>
+                <div class="form-group">
+                  <label for="username">用户名</label>
+                  <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                  <label for="password">密码</label>
+                  <input type="password" class="form-control" id="password" placeholder="请输入密码">
+                </div>
+                <button type="button" id="login" class="btn btn-success">登 录</button>
+              </form>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="row">
+            <div class="col-md-2 col-sm-2">
+              <img style="cursor: pointer;" src="/avatar/<%= avatar %>" id="avatar">
+            </div>
+            <div class="col-md-9 col-sm-9">
+              <p><%= username %></p>
+              <textarea class="form-control" id="content" cols="80" rows="6" placeholder="填写说说内容" style="margin-bottom: 10px;"></textarea>
+              <button id="publish" class="btn btn-success">发表说说</button>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Example row of columns -->
+      <% if (login) { %>
+        <ul class="pagination">
+          
+        </ul>
+      <% } %>
+      <div class="row" id="posts">
+        
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div> <!-- /container -->
+    <script type="text/template" id="post">
+      <div class="col-md-4 col-sm-4 grid">
+        <h3><img class="avatar" src="/avatar/{{= avatar }}">&nbsp;&nbsp;{{= username }}</h3>
+        <p>{{= content}} </p>
+        <p>{{= createtime}}</p>
+        <p><a class="btn btn-default" href="#" role="button">详 情 &raquo;</a></p>
+      </div>
+    </script>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/underscore-noflict-min.js"></script>
+    <script type="text/javascript">
+      let oPosts = $('#posts');
+      let compiled = _.template($('#post').html());
+      // 获取所有说说
+      function getPosts (page) {
+        $('#posts').html('');
+        $.get('/getAllPosts?page=' + page + '&perPage=9', function (result) {
+          let { status, items } = result;
+          if (status == 'success') {
+            (function iterator (i) {
+              if (i == items.length) {
+                return;
+              }
+              $.get('/getuserinfo?username=' + items[i].username, function (result) {
+                items[i].avatar = result.data.avatar;
+                let tmpHtml = compiled(items[i]);
+                oPosts.append(tmpHtml);
+                iterator(i + 1);
+              })
+            })(0);
+          }
+        });
+      }
+      getPosts(1);
+      // 设置头像
+      $('#avatar').click(function () {
+        window.location = '/setavatar';
+      });
+
+      // 登录
+      $('#login').click(function () {
+        $.post('/dologin', {
+          username: $('#username').val(),
+          password: $('#password').val()
+        }, function (result) {
+          if (result == '1') {
+            window.location = '/';
+          } else if (result == '-1') {
+            alert('用户不存在！');
+          } else if (result == '-2') {
+            alert('登录密码错误！');
+          } else {
+            alert('服务器错误！');
+          }
+        }); 
+      });
+
+      // 发表说说
+      $('#publish').click(function () {
+        $.post('/dopost', {
+          content: $('#content').val()
+        }, function (result) {
+          if (result == '1') {
+            alert('发布说说成功');
+            $('#content').val('');
+            window.location = '/';
+          } else {
+            alert('发布说说失败，请联系管理员。');
+            window.location = '/';
+          }
+        });
+      });
+
+      // 登出
+      $('#loginout').click(function () {
+        alert('/dologinout')
+        $.post('/dologinout', {}, function () {});
+      });
+
+      // 分页操作
+      $.get('/getcounts', function (result) {
+        if (result.status == 'success') {
+          let pageNumber = Math.ceil(result.count / 9);
+          for (let i = 0; i < pageNumber; i++) {
+            $('.pagination').append(`<li><a href="javascript: void(0);">${i+1}</a></li>`);
+          }
+
+          $('.pagination li:first').addClass('active');
+
+          $('.pagination li').click(function () {
+            $(this).addClass('active').siblings().removeClass('active');
+            let page = parseInt($(this).index()) + 1;
+            getPosts(page);
+          });
+        }
+      });
+
+    </script>
+  </body>
+</html>

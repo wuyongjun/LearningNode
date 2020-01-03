@@ -1,0 +1,44 @@
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">我的论坛</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li <% if (page == 'home') { %>class="active"<% } %>>
+          <a href="/">全部帖子 <span class="sr-only">(current)</span></a>
+        </li>
+        <% if (login) { %>
+          <li <% if (page == 'my') { %>class="active"<% } %>>
+            <a href="/posts/<%= username %>">我的帖子</a>
+          </li>
+          <li <% if (page == 'users') { %>class="active"<% } %>>
+            <a href="/userlist">成员列表</a>
+          </li>
+        <% } %>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <% if (login) { %>
+          <li><a href="#">当前用户：<%= username %></a></li>
+          <li <% if (page == 'setting') { %>class="active"<% } %>>
+            <a href="/setting">设置个人资料</a>
+          </li>
+          <li><a href="/dologinout">登出</a></li>
+        <% } else { %>
+          <li <% if (page == 'regist') { %>class="active"<% } %>>
+            <a href="/regist">注 册</a>
+          </li>
+          <li <% if (page == 'login') { %>class="active"<% } %>>
+            <a href="/login">登 录</a>
+          </li>
+        <% } %>
+      </ul>
+    </div><!--/.navbar-collapse -->
+  </div>
+</nav>

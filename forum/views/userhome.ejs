@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+
+    <title><%= user %>的主页</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/jumbotron.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+      .item {
+        border-bottom: 1px solid black;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <%- include('header.ejs') %>
+    <div class="container">
+      <!-- Example row of columns -->
+      <img src="/avatar/<%= avatar %>">
+      <h2><%= user %>的个人主页</h2>
+      <div class="row">
+        <div class="col-md-8">
+          <% for (var i = 0; i < posts.length; i++) { %>
+            <div class="item">
+              <p><%= posts[i].content %></p>
+              <p><%= posts[i].createtime %></p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div> <!-- /container -->
+    
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+  </body>
+</html>
